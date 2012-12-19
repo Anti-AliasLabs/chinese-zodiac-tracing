@@ -41,17 +41,15 @@ void draw() {
 }
 
 void keyPressed() {
-  switch( key ) {
-  case '1':
-    currChar = 0;
-    break;
+  updateCharacter(key);
+}
 
-  case '2':
-    currChar = 1;
-    break;
+void updateCharacter(char inputChar) {
+  int selectedChar = inputChar - 48;
 
-  case '3':
-    currChar = 2;
-    break;
+  if ( selectedChar > 0 && selectedChar <= numChar) {
+    println(selectedChar);
+    currChar = selectedChar-1;
   }
 }
+
