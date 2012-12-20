@@ -10,8 +10,7 @@ detects an RFID tag and a Kinect connected to a computer running Processing.
 Dependencies
 ----------------------
 Processing
-- available at [processing.org](http://processing.org)
-- 
+- available at [processing.org](http://processing.org) 
 
 Arduino
 - available at [arduino.cc](http://arduino.cc)

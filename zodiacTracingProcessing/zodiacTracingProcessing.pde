@@ -20,8 +20,12 @@
  * along with chinese-zodiac-tracing.  If not, see <http://www.gnu.org/licenses/>.
  *********************************************************************************/
 
-PImage characters[];
+TracedCharacter characters[];
 final int numChar = 3;
+
+int traceLocations[];
+int currTrace = 0;
+final int traceLimit = 1000;
 
 int currChar = 0;
 
@@ -29,19 +33,54 @@ void setup() {
   size(500, 500); 
 
   // load in images
-  characters = new PImage[numChar];
-  characters[0] = loadImage("ox.png");
-  characters[1] = loadImage("dragon.png");
-  characters[2] = loadImage("horse.png");
+  characters = new TracedCharacter[numChar];
+  characters[0] = new TracedCharacter("ox.png", width, height);
+  characters[1] = new TracedCharacter("dragon.png", width, height);
+  characters[2] = new TracedCharacter("horse.png", width, height);
+  
+  // initialize trace locations
+  traceLocations = new int[traceLimit];
+  for ( int i=0; i<traceLimit; i++) {
+   traceLocations[i] = -100; // initialize to a value outside window
+  }
 }
 
 void draw() {
-  background(20, 150, 150);
-  image(characters[currChar], 0, 0, width, height);
+  background(200, 50, 150);
+  if ( characters[currChar].isOver(mouseX, mouseY)) {
+    background(20, 150, 150);
+    
+    storeTrace();
+  }
+
+  // draw to the window
+  characters[currChar].drawCharacter();
+  
+  drawTrace();
 }
 
 void keyPressed() {
   updateCharacter(key);
+}
+
+void storeTrace() {
+  if( currTrace < traceLimit-1 ) {
+    traceLocations[currTrace] = mouseX;
+    traceLocations[currTrace+1] = mouseY;
+    currTrace +=2;
+  }
+  
+}
+
+void drawTrace() {
+  // draw trace path
+  fill(30, 30, 100);
+  noStroke();
+  
+  for( int i=0; i<currTrace-1; i+=2) {
+    ellipse(traceLocations[i], traceLocations[i+1], 30, 30);
+  }
+  
 }
 
 void updateCharacter(char inputChar) {
