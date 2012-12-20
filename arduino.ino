@@ -30,7 +30,7 @@ void loop(){
   while(Serial.available()){
 
     int readByte = Serial.read(); 
-    
+     
     if(readByte == 2) reading = true; 
     if(readByte == 3) reading = false;
 
