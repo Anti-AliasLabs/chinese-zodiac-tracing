@@ -33,19 +33,22 @@ String       lastGesture = "";
 
 // Tracing and character variables
 TracedCharacter characters[];
-final int numChar = 3;
+final int numChar = 12;
 
 int traceLocations[];
 int currTrace = 0;
-final int traceLimit = 1000;
+final int traceLimit = 5000;
 
 int currChar = 0;
 
-int resetTime = 1; // 1 minute
+int resetTime = 10; // 1 minute
 int lastMovement = 0;
 
+
+float penX, penY, penZ;
+
 void setup() {
-  size(500, 500); 
+  size(1024, 768); 
 
   // setup Kinect
   context = new SimpleOpenNI(this);
@@ -73,6 +76,15 @@ void setup() {
   characters[0] = new TracedCharacter("ox.png", width, height);
   characters[1] = new TracedCharacter("dragon.png", width, height);
   characters[2] = new TracedCharacter("horse.png", width, height);
+  characters[3] = new TracedCharacter("ram.png", width, height);
+  characters[4] = new TracedCharacter("rabbit.png", width, height);
+  characters[5] = new TracedCharacter("snake.png", width, height);
+  characters[6] = new TracedCharacter("boar.png", width, height);
+  characters[7] = new TracedCharacter("mouse.png", width, height);
+  characters[8] = new TracedCharacter("dog.png", width, height);
+  characters[9] = new TracedCharacter("tiger.png", width, height);
+  characters[10] = new TracedCharacter("monkey.png", width, height);
+  characters[11] = new TracedCharacter("rooster.png", width, height);
 
   // initialize trace locations
   traceLocations = new int[traceLimit];
@@ -89,24 +101,35 @@ void draw() {
 
 
   background(200, 50, 150);
-  if ( characters[currChar].isOver(mouseX, mouseY) && handsTrackFlag) {
+
+  // transform hand to window pixels
+  mapHandToPen(handVec.x, handVec.y);
+  // if hand is being tracked and close enough to camera
+  if ( characters[currChar].isOver(mouseX, mouseY) && handsTrackFlag && handVec.z < 1100) {
     background(20, 150, 150);
 
-    storeTrace(int(handVec.x), int(handVec.y));
-    lastMovement = minute();
+
+    storeTrace(int(penX), int(penY));
+    println(context.sceneWidth() - handVec.y);
+    lastMovement = second();
   }
 
   // check time and reset if necessary
-  if ( lastMovement-minute() > resetTime ) {
+  if ( lastMovement-second() > resetTime ) {
+    println("resetting tracing array");
     for ( int i=0; i<traceLimit; i++) {
       traceLocations[i] = -100; // initialize to a value outside window
     }
+    lastMovement = second();
   } 
 
   // draw to the window
   characters[currChar].drawCharacter();
 
   drawTrace();
+  fill(255);
+  ellipse(penX, penY, 15, 15);
+  //text(handVec.x + " " + handVec.y + " " + handVec.z, 100, 100);
 }
 
 // -----------------------------------------------------------------
@@ -126,23 +149,49 @@ void storeTrace(int traceX, int traceY) {
 
 void drawTrace() {
   // draw trace path
-  fill(30, 30, 100);
+  fill(200);
   noStroke();
 
   for ( int i=0; i<currTrace-1; i+=2) {
-    ellipse(traceLocations[i], traceLocations[i+1], 30, 30);
+    ellipse(traceLocations[i], traceLocations[i+1], 20, 20);
   }
 }
 
 void updateCharacter(char inputChar) {
-  int selectedChar = inputChar - 48;
+  // 1-9 for [0] to [8]
+  // A for [9]
+  // B for [10]
+  // C for [11]
 
-  if ( selectedChar > 0 && selectedChar <= numChar) {
-    println(selectedChar);
-    currChar = selectedChar-1;
+  switch (inputChar) {
+  case 'A':
+    currChar = 9;
+    break;
+  case 'B':
+    currChar = 10;
+    break;
+  case 'C':
+    currChar = 11; 
+    break;
+  default:
+    int selectedChar = inputChar - 48;
+
+    if ( selectedChar > 0 && selectedChar <= numChar) {
+      println(selectedChar);
+      currChar = selectedChar-1;
+    }
   }
 }
 
+
+void mapHandToPen(float handX, float handY) {
+  // x ranges from -500 to 500
+  // y rangers from -30 to 410
+  // z pen down < 1000, pen up > 1000
+
+  penX = map(handX, -500, 500, 0, width);
+  penY = map(handY, -30, 410, 0, height) * -1;
+}
 
 // -----------------------------------------------------------------
 // hand events
