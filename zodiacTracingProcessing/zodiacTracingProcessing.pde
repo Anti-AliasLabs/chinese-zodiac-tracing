@@ -21,6 +21,9 @@
  *********************************************************************************/
 
 import SimpleOpenNI.*;
+import processing.serial.*;
+
+Serial myPort; // The serial port:
 
 // SimpleOpenNI variables
 SimpleOpenNI context;
@@ -70,6 +73,12 @@ void setup() {
 
   // add waving recognition
   context.addGesture("Wave");
+
+  // set up port for Arduino
+  // You may need to change the number in [ ] to match 
+  // the correct port for your system
+  myPort = new Serial(this, Serial.list()[0], 9600);
+  myPort.bufferUntil('\r');
 
   // load in images
   characters = new TracedCharacter[numChar];
@@ -244,5 +253,18 @@ void onRecognizeGesture(String strGesture, PVector idPosition, PVector endPositi
 void onProgressGesture(String strGesture, PVector position, float progress)
 {
   //println("onProgressGesture - strGesture: " + strGesture + ", position: " + position + ", progress:" + progress);
+}
+
+
+// -----------------------------------------------------------------
+// serial events
+void serialEvent(Serial myPort) {
+  // read a byte from the serial port:
+  String inString = myPort.readStringUntil('\r');
+  println(inString);
+  
+  String trimmedString = trim( inString );
+  println( trimmedString);
+  updateCharacter( trimmedString.charAt(0) );
 }
 
