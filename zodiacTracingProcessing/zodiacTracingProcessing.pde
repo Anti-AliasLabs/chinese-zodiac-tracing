@@ -92,6 +92,7 @@ void setup() {
     traceLocations[i] = -100; // initialize to a value outside window
   }
 
+  noCursor();
   smooth();
 }
 
@@ -150,10 +151,11 @@ void storeTrace(int traceX, int traceY) {
 void drawTrace() {
   // draw trace path
   fill(200);
-  noStroke();
+  stroke(200);
+  strokeWeight(8);
 
-  for ( int i=0; i<currTrace-1; i+=2) {
-    ellipse(traceLocations[i], traceLocations[i+1], 20, 20);
+  for ( int i=0; i<currTrace-3; i+=2) {
+    line(traceLocations[i], traceLocations[i+1], traceLocations[i+2], traceLocations[i+3]);
   }
 }
 
