@@ -50,6 +50,10 @@ int lastMovement = 0;
 
 float penX, penY, penZ;
 
+// background images
+PImage penBG;
+PImage noPenBG;
+
 void setup() {
   size(1024, 768); 
 
@@ -94,6 +98,9 @@ void setup() {
   characters[9] = new TracedCharacter("tiger.png");
   characters[10] = new TracedCharacter("monkey.png");
   characters[11] = new TracedCharacter("rooster.png");
+  
+  penBG = loadImage("pen.jpg");
+  noPenBG = loadImage("no_pen.jpg");
 
   // initialize trace locations
   traceLocations = new int[traceLimit];
@@ -110,14 +117,15 @@ void draw() {
   context.update();
 
 
-  background(200, 50, 150);
+  //background(200, 50, 150);
+  background(noPenBG);
 
   // transform hand to window pixels
   mapHandToPen(handVec.x, handVec.y);
   // if hand is being tracked and close enough to camera
   if ( characters[currChar].isOver(mouseX, mouseY) && handsTrackFlag && handVec.z < 1100) {
-    background(20, 150, 150);
-
+    //background(20, 150, 150);
+    background(penBG);
 
     storeTrace(int(penX), int(penY));
     println(context.sceneWidth() - handVec.y);
@@ -160,7 +168,7 @@ void storeTrace(int traceX, int traceY) {
 void drawTrace() {
   // draw trace path
   fill(200);
-  stroke(200);
+  stroke(111, 12, 12);
   strokeWeight(8);
 
   for ( int i=0; i<currTrace-3; i+=2) {
