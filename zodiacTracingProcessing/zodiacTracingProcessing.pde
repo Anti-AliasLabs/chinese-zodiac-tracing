@@ -73,18 +73,18 @@ void setup() {
 
   // load in images
   characters = new TracedCharacter[numChar];
-  characters[0] = new TracedCharacter("ox.png", width, height);
-  characters[1] = new TracedCharacter("dragon.png", width, height);
-  characters[2] = new TracedCharacter("horse.png", width, height);
-  characters[3] = new TracedCharacter("ram.png", width, height);
-  characters[4] = new TracedCharacter("rabbit.png", width, height);
-  characters[5] = new TracedCharacter("snake.png", width, height);
-  characters[6] = new TracedCharacter("boar.png", width, height);
-  characters[7] = new TracedCharacter("mouse.png", width, height);
-  characters[8] = new TracedCharacter("dog.png", width, height);
-  characters[9] = new TracedCharacter("tiger.png", width, height);
-  characters[10] = new TracedCharacter("monkey.png", width, height);
-  characters[11] = new TracedCharacter("rooster.png", width, height);
+  characters[0] = new TracedCharacter("ox.png");
+  characters[1] = new TracedCharacter("dragon.png");
+  characters[2] = new TracedCharacter("horse.png");
+  characters[3] = new TracedCharacter("ram.png");
+  characters[4] = new TracedCharacter("rabbit.png");
+  characters[5] = new TracedCharacter("snake.png");
+  characters[6] = new TracedCharacter("boar.png");
+  characters[7] = new TracedCharacter("mouse.png");
+  characters[8] = new TracedCharacter("dog.png");
+  characters[9] = new TracedCharacter("tiger.png");
+  characters[10] = new TracedCharacter("monkey.png");
+  characters[11] = new TracedCharacter("rooster.png");
 
   // initialize trace locations
   traceLocations = new int[traceLimit];

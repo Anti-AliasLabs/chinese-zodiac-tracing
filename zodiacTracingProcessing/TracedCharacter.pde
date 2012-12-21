@@ -4,10 +4,10 @@ class TracedCharacter {
   int winWidth, winHeight;
 
   // constructor
-  TracedCharacter(String filename, int winW, int winH) {
+  TracedCharacter(String filename) {
     charImage = loadImage(filename);
-    winWidth = winW;
-    winHeight = winH;
+    //winWidth = winW;
+    //winHeight = winH;
 
     /*charImage.loadPixels();
      for(int i=0; i<(charImage.width*charImage.height); i++) {
@@ -52,7 +52,8 @@ class TracedCharacter {
 
   // draw the character
   void drawCharacter() {
-    image(charImage, 0, 0, width, height);
+    imageMode(CENTER);
+    image(charImage, width/2, height/2, height-40, height-40);
   }
 }
 
