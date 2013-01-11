@@ -53,7 +53,7 @@ class TracedCharacter {
   // draw the character
   void drawCharacter() {
     imageMode(CENTER);
-    image(charImage, width/2, height/2, height-40, height-40);
+    image(charImage, width/2, height/2, height-60, height-60);
   }
 }
 

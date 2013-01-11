@@ -44,7 +44,7 @@ final int traceLimit = 5000;
 
 int currChar = 0;
 
-int resetTime = 10; // 1 minute
+int resetTime = 5000;
 int lastMovement = 0;
 
 
@@ -53,6 +53,7 @@ float penX, penY, penZ;
 // background images
 PImage penBG;
 PImage noPenBG;
+PImage penCursor;
 
 void setup() {
   size(1024, 768); 
@@ -98,10 +99,11 @@ void setup() {
   characters[9] = new TracedCharacter("tiger.png");
   characters[10] = new TracedCharacter("monkey.png");
   characters[11] = new TracedCharacter("rooster.png");
-  
+
   penBG = loadImage("pen.jpg");
   noPenBG = loadImage("no_pen.jpg");
 
+  penCursor = loadImage("pen_cursor.png");
   // initialize trace locations
   traceLocations = new int[traceLimit];
   for ( int i=0; i<traceLimit; i++) {
@@ -118,7 +120,8 @@ void draw() {
 
 
   //background(200, 50, 150);
-  background(noPenBG);
+  
+  
 
   // transform hand to window pixels
   mapHandToPen(handVec.x, handVec.y);
@@ -126,27 +129,36 @@ void draw() {
   if ( characters[currChar].isOver(mouseX, mouseY) && handsTrackFlag && handVec.z < 1100) {
     //background(20, 150, 150);
     background(penBG);
+    characters[currChar].drawCharacter();
+    fill(255);
+    drawTrace();
+     
+
+    image(penCursor, penX, penY);
 
     storeTrace(int(penX), int(penY));
     println(context.sceneWidth() - handVec.y);
-    lastMovement = second();
+    lastMovement = millis();
+  }
+  else {
+    background(noPenBG);
+    characters[currChar].drawCharacter();
+    fill(255);
+    drawTrace();
+    ellipse(penX, penY, 15, 15);
   }
 
+  
   // check time and reset if necessary
-  if ( lastMovement-second() > resetTime ) {
+  if ( (millis()-lastMovement) > resetTime ) {
     println("resetting tracing array");
     for ( int i=0; i<traceLimit; i++) {
       traceLocations[i] = -100; // initialize to a value outside window
     }
-    lastMovement = second();
+    lastMovement = millis();
   } 
 
-  // draw to the window
-  characters[currChar].drawCharacter();
 
-  drawTrace();
-  fill(255);
-  ellipse(penX, penY, 15, 15);
   //text(handVec.x + " " + handVec.y + " " + handVec.z, 100, 100);
 }
 
@@ -168,8 +180,8 @@ void storeTrace(int traceX, int traceY) {
 void drawTrace() {
   // draw trace path
   fill(200);
-  stroke(111, 12, 12);
-  strokeWeight(8);
+  stroke(250, 12, 12);
+  strokeWeight(16);
 
   for ( int i=0; i<currTrace-3; i+=2) {
     line(traceLocations[i], traceLocations[i+1], traceLocations[i+2], traceLocations[i+3]);
@@ -209,7 +221,8 @@ void mapHandToPen(float handX, float handY) {
   // z pen down < 1000, pen up > 1000
 
   penX = map(handX, -500, 500, 0, width);
-  penY = map(handY, -30, 410, 0, height) * -1;
+  penY = map(handY, -50, 100, 30, height-30) * -1;
+  //println(handY + " " + penY);
 }
 
 // -----------------------------------------------------------------
@@ -270,7 +283,7 @@ void serialEvent(Serial myPort) {
   // read a byte from the serial port:
   String inString = myPort.readStringUntil('\r');
   println(inString);
-  
+
   String trimmedString = trim( inString );
   println( trimmedString);
   updateCharacter( trimmedString.charAt(0) );
