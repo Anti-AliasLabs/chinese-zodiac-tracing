@@ -153,9 +153,7 @@ void draw() {
   // check time and reset if necessary
   if ( (millis()-lastMovement) > resetTime ) {
     println("resetting tracing array");
-    /*for ( int i=0; i<traceLimit; i++) {
-      traceLocations[i] = -100; // initialize to a value outside window
-    }*/
+    pen.reset();
     lastMovement = millis();
   } 
 

@@ -6,7 +6,10 @@ class Pen {
   }
 
   // add indicator to break line drawing
-  void penDown() {
+  void reset() {
+    for( int i=0; i<penPath.size(); i++ ) {
+     penPath.remove(i); 
+    }
   }
 
   // add indicator to start line drawing
