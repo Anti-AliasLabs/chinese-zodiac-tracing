@@ -43,7 +43,7 @@ boolean prevPenState = false;
 
 int currChar = 0;
 
-int resetTime = 5000;
+int resetTime = 8000;
 int lastMovement = 0;
 
 
@@ -77,6 +77,7 @@ void setup() {
 
   // add waving recognition
   context.addGesture("Wave");
+  context.addGesture("RaiseHand");
 
   // set up port for Arduino
   // You may need to change the number in [ ] to match 
@@ -173,6 +174,9 @@ void updateCharacter(char inputChar) {
   // A for [9]
   // B for [10]
   // C for [11]
+  if( inputChar != currChar) {
+   pen.reset(); 
+  }
 
   switch (inputChar) {
   case 'A':
