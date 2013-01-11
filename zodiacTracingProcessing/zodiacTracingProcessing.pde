@@ -38,9 +38,8 @@ String       lastGesture = "";
 TracedCharacter characters[];
 final int numChar = 12;
 
-int traceLocations[];
-int currTrace = 0;
-final int traceLimit = 5000;
+Pen pen;
+boolean prevPenState = false;
 
 int currChar = 0;
 
@@ -104,11 +103,7 @@ void setup() {
   noPenBG = loadImage("no_pen.jpg");
 
   penCursor = loadImage("pen_cursor.png");
-  // initialize trace locations
-  traceLocations = new int[traceLimit];
-  for ( int i=0; i<traceLimit; i++) {
-    traceLocations[i] = -100; // initialize to a value outside window
-  }
+  pen = new Pen();
 
   noCursor();
   smooth();
@@ -127,34 +122,40 @@ void draw() {
   mapHandToPen(handVec.x, handVec.y);
   // if hand is being tracked and close enough to camera
   if ( characters[currChar].isOver(mouseX, mouseY) && handsTrackFlag && handVec.z < 1100) {
-    //background(20, 150, 150);
     background(penBG);
     characters[currChar].drawCharacter();
-    fill(255);
-    drawTrace();
-     
+     pen.display();
 
     image(penCursor, penX, penY);
 
-    storeTrace(int(penX), int(penY));
+    pen.record(int(penX), int(penY));
     println(context.sceneWidth() - handVec.y);
     lastMovement = millis();
+    prevPenState = true;
   }
   else {
     background(noPenBG);
     characters[currChar].drawCharacter();
+    pen.display();
+    
+    // show where hand is being tracked
     fill(255);
-    drawTrace();
+    noStroke();
+    
     ellipse(penX, penY, 15, 15);
+    if (prevPenState) {
+      pen.up();
+    }
+    prevPenState = false;
   }
 
   
   // check time and reset if necessary
   if ( (millis()-lastMovement) > resetTime ) {
     println("resetting tracing array");
-    for ( int i=0; i<traceLimit; i++) {
+    /*for ( int i=0; i<traceLimit; i++) {
       traceLocations[i] = -100; // initialize to a value outside window
-    }
+    }*/
     lastMovement = millis();
   } 
 
@@ -167,25 +168,6 @@ void draw() {
 
 void keyPressed() {
   updateCharacter(key);
-}
-
-void storeTrace(int traceX, int traceY) {
-  if ( currTrace < traceLimit-1 ) {
-    traceLocations[currTrace] = traceX;
-    traceLocations[currTrace+1] = traceY;
-    currTrace +=2;
-  }
-}
-
-void drawTrace() {
-  // draw trace path
-  fill(200);
-  stroke(250, 12, 12);
-  strokeWeight(16);
-
-  for ( int i=0; i<currTrace-3; i+=2) {
-    line(traceLocations[i], traceLocations[i+1], traceLocations[i+2], traceLocations[i+3]);
-  }
 }
 
 void updateCharacter(char inputChar) {
