@@ -197,11 +197,12 @@ void updateCharacter(char inputChar) {
 
 void mapHandToPen(float handX, float handY) {
   // x ranges from -500 to 500
-  // y rangers from -30 to 410
+  // y ranges from -30 to 410
   // z pen down < 1000, pen up > 1000
 
   penX = map(handX, -500, 500, 0, width);
-  penY = map(handY, -50, 100, 30, height-30) * -1;
+  //penY = map(handY, -50, 100, 30, height-30) * -1;
+  penY = handY * -1.73 + 508;
   //println(handY + " " + penY);
 }
 
