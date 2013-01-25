@@ -105,20 +105,6 @@ void setup() {
     println("Error: couldn't find characters.xml");
   }
 
-  /*characters = new TracedCharacter[numChar];
-   characters[0] = new TracedCharacter("ox.png");
-   characters[1] = new TracedCharacter("dragon.png");
-   characters[2] = new TracedCharacter("horse.png");
-   characters[3] = new TracedCharacter("ram.png");
-   characters[4] = new TracedCharacter("rabbit.png");
-   characters[5] = new TracedCharacter("snake.png");
-   characters[6] = new TracedCharacter("boar.png");
-   characters[7] = new TracedCharacter("mouse.png");
-   characters[8] = new TracedCharacter("dog.png");
-   characters[9] = new TracedCharacter("tiger.png");
-   characters[10] = new TracedCharacter("monkey.png");
-   characters[11] = new TracedCharacter("rooster.png");*/
-
   penBG = loadImage("pen.jpg");
   noPenBG = loadImage("no_pen.jpg");
 
@@ -186,36 +172,11 @@ void draw() {
 // character tracing
 
 void keyPressed() {
-  //updateCharacter(key.toString());
+  Character c = key;
+  updateCharacter( c.toString() );
 }
 
 void updateCharacter(String inputChar) {
-  // 1-9 for [0] to [8]
-  // A for [9]
-  // B for [10]
-  // C for [11]
-  /*if( inputChar != currChar) {
-   pen.reset(); 
-   }
-   
-   switch (inputChar) {
-   case 'A':
-   currChar = 9;
-   break;
-   case 'B':
-   currChar = 10;
-   break;
-   case 'C':
-   currChar = 11; 
-   break;
-   default:
-   int selectedChar = inputChar - 48;
-   
-   if ( selectedChar > 0 && selectedChar <= numChar) {
-   println(selectedChar);
-   currChar = selectedChar-1;
-   }
-   }*/
   if ( charImages.containsKey(inputChar) ) {
     currChar = inputChar;
   } else {
@@ -304,7 +265,6 @@ void loadNewImage() {
   println(characters.countChildren());
   for (int i = 0; i < characters.countChildren();i++) {
     // retrieve character
-    println(i);
     character = characters.getChild(i).getChildren();
 
     // get card number and filename
