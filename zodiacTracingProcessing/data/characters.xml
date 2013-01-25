@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<characters>
+  <character>
+    <card>1</card>
+    <filename>ox.png</filename>
+  </character>
+
+  <character>
+    <card>2</card>
+    <filename>dragon.png</filename>
+  </character>
+
+  <character>
+    <card>3</card>
+    <filename>horse.png</filename>
+  </character>
+
+  <character>
+    <card>4</card>
+    <filename>ram.png</filename>
+  </character>
+
+  <character>
+    <card>5</card>
+    <filename>rabbit.png</filename>
+  </character>
+
+  <character>
+    <card>6</card>
+    <filename>snake.png</filename>
+  </character>
+
+  <character>
+    <card>7</card>
+    <filename>boar.png</filename>
+  </character>
+
+  <character>
+    <card>8</card>
+    <filename>mouse.png</filename>
+  </character>
+
+  <character>
+    <card>9</card>
+    <filename>dog.png</filename>
+  </character>
+
+  <character>
+    <card>A</card>
+    <filename>tiger.png</filename>
+  </character>
+
+  <character>
+    <card>B</card>
+    <filename>monkey.png</filename>
+  </character>
+
+  <character>
+    <card>C</card>
+    <filename>rooster.png</filename>
+  </character>
+</charaacters>
