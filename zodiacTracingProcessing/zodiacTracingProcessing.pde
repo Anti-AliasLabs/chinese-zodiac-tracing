@@ -42,15 +42,15 @@ HashMap charImages;
 XMLElement characters;
 XMLInOut xmlInOut;
 
-//TracedCharacter characters[];
-//final int numChar = 12;
+PImage wave;
+boolean showInstructions = true;
 
 Pen pen;
 boolean prevPenState = false;
 
 String currChar = "";
 
-int resetTime = 8000;
+int resetTime = 30000;
 int lastMovement = 0;
 
 
@@ -105,11 +105,14 @@ void setup() {
     println("Error: couldn't find characters.xml");
   }
 
+  imageMode(CENTER);
   penBG = loadImage("pen.jpg");
   noPenBG = loadImage("no_pen.jpg");
 
   penCursor = loadImage("pen_cursor.png");
   pen = new Pen();
+
+  wave = loadImage("wave.png");
 
   noCursor();
   smooth();
@@ -119,49 +122,50 @@ void draw() {
   // update the Kinect
   context.update();
 
-  // transform hand to window pixels
-  mapHandToPen(handVec.x, handVec.y);
-  // if hand is being tracked and close enough to camera
-  if ( handsTrackFlag && handVec.z < 1100) {
-    background(penBG);
-    if ( currChar != "" ) {
-      TracedCharacter tc = (TracedCharacter) charImages.get(currChar);
-      tc.drawCharacter();
-    }
-    pen.display();
-
-    image(penCursor, penX, penY);
-
-    pen.record(int(penX), int(penY));
-    println(context.sceneWidth() - handVec.y);
-    lastMovement = millis();
-    prevPenState = true;
-  }
+  if ( showInstructions ) {
+    drawBackgroundAndCharacter( false );
+    image(wave, width/2, height/2, width, height);
+  } 
   else {
-    background(noPenBG);
-    if ( currChar != "" ) {
-      TracedCharacter tc = (TracedCharacter)charImages.get(currChar);
-      tc.drawCharacter();
-    }
-    pen.display();
 
-    // show where hand is being tracked
-    fill(255);
-    noStroke();
+    // transform hand to window pixels
+    mapHandToPen(handVec.x, handVec.y);
+    // if hand is being tracked and close enough to camera
+    if ( handsTrackFlag && handVec.z < 1100) {
+      background(penBG);
+      drawBackgroundAndCharacter( true );
 
-    ellipse(penX, penY, 15, 15);
-    if (prevPenState) {
-      pen.up();
+      pen.display();
+
+      image(penCursor, penX, penY);
+
+      pen.record(int(penX), int(penY));
+      println(context.sceneWidth() - handVec.y);
+      lastMovement = millis();
+      prevPenState = true;
     }
-    prevPenState = false;
+    else {
+      background(noPenBG);
+      drawBackgroundAndCharacter( false );
+
+      pen.display();
+
+      // show where hand is being tracked
+      fill(255);
+      noStroke();
+
+      ellipse(penX, penY, 15, 15);
+      if (prevPenState) {
+        pen.up();
+      }
+      prevPenState = false;
+    }
   }
-
 
   // check time and reset if necessary
   if ( (millis()-lastMovement) > resetTime ) {
-    println("resetting tracing array");
-    pen.reset();
-    lastMovement = millis();
+    resetTracing();
+    showInstructions = true;
   } 
 
 
@@ -171,6 +175,30 @@ void draw() {
 // -----------------------------------------------------------------
 // character tracing
 
+void resetTracing() {
+  println("resetting tracing array");
+  pen.reset();
+  drawBackgroundAndCharacter( false );
+  lastMovement = millis();
+}
+
+void drawBackgroundAndCharacter(boolean penDown) {
+  if ( penDown) {
+    background(penBG);
+    if ( currChar != "" ) {
+      TracedCharacter tc = (TracedCharacter) charImages.get(currChar);
+      tc.drawCharacter();
+    }
+  } 
+  else {
+    background(noPenBG);
+    if ( currChar != "" ) {
+      TracedCharacter tc = (TracedCharacter) charImages.get(currChar);
+      tc.drawCharacter();
+    }
+  }
+}
+
 void keyPressed() {
   Character c = key;
   updateCharacter( c.toString() );
@@ -178,9 +206,16 @@ void keyPressed() {
 
 void updateCharacter(String inputChar) {
   if ( charImages.containsKey(inputChar) ) {
+    resetTracing();
     currChar = inputChar;
-  } else {
-     println("Not known key"); 
+  } 
+  else {
+    if ( inputChar.equals("D") ) {
+      resetTracing();
+    } 
+    else {
+      println("Not known key");
+    }
   }
 }
 
@@ -207,6 +242,8 @@ void onCreateHands(int handId, PVector pos, float time)
 
   handVecList.clear();
   handVecList.add(pos);
+
+  showInstructions = false;
 }
 
 void onUpdateHands(int handId, PVector pos, float time)
@@ -295,6 +332,6 @@ void serialEvent(Serial myPort) {
   String trimmedString = trim( inString );
   println( trimmedString);
   //updateCharacter( trimmedString.charAt(0) );
-    updateCharacter( trimmedString );
+  updateCharacter( trimmedString );
 }
 
