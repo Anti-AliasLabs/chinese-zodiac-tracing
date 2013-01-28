@@ -42,17 +42,16 @@ HashMap charImages;
 XMLElement characters;
 XMLInOut xmlInOut;
 
+//TracedCharacter characters[];
+//final int numChar = 12;
+
 Pen pen;
 boolean prevPenState = false;
 
 String currChar = "";
 
-int resetTime = 16000;
+int resetTime = 8000;
 int lastMovement = 0;
-boolean interactionFlag = true;
-boolean prevInteractionFlag = false;
-
-int countdownTime = 0;
 
 
 float penX, penY, penZ;
@@ -61,12 +60,6 @@ float penX, penY, penZ;
 PImage penBG;
 PImage noPenBG;
 PImage penCursor;
-PImage wave;
-PImage countdown1;
-PImage countdown2;
-PImage countdown3;
-PImage draw;
-
 
 void setup() {
   size(1024, 768); 
@@ -118,14 +111,6 @@ void setup() {
   penCursor = loadImage("pen_cursor.png");
   pen = new Pen();
 
-  wave  = loadImage("wave.png");
-  countdown1  = loadImage("position1.png");
-  countdown2  = loadImage("position2.png");
-  countdown3  = loadImage("position3.png");
-  draw = loadImage("draw.png");
-
-
-  imageMode(CENTER);
   noCursor();
   smooth();
 }
@@ -136,122 +121,52 @@ void draw() {
 
   // transform hand to window pixels
   mapHandToPen(handVec.x, handVec.y);
-
-  // if no tracking or interaction display instructions
-  /*if ( !handsTrackFlag && !interactionFlag) {
-
-    drawBackgroundAndCharacter(false);
-    noStroke();
-    fill(50, 150);
-    rect(0, 0, width, height);
-    image( wave, width/2, height/2, width, height);
-  }*/
-
-  //if hand is being tracked 
-  if ( handsTrackFlag ) {
-    // if there wasn't interaction previously
-    // run the starting instructions
-    if ( !interactionFlag ) {
-      drawBackgroundAndCharacter(false);
-      startInteraction();
-      ellipse(penX, penY, 15, 15);
-    }
-    else {
-      // if hand is being tracked and close enough to camera then draw
-      if (handVec.z < 1100) {
-        drawBackgroundAndCharacter(true);
-        pen.display();
-
-        image(penCursor, penX, penY);
-
-        pen.record(int(penX), int(penY));
-
-        lastMovement = millis();
-        prevPenState = true;
-      }
-      // if hand is being tracked, but not actively drawing
-      else {
-        drawBackgroundAndCharacter(false);
-        pen.display();
-
-        // show where hand is being tracked
-        fill(255);
-        noStroke();
-
-        ellipse(penX, penY, 15, 15);
-        if (prevPenState) {
-          pen.up();
-        }
-        prevPenState = false;
-      }
-    }
-  } else { // hand isn't being tracked
-    drawBackgroundAndCharacter(false);
-  }
-
-
-  /*// check time and reset if necessary
-  if ( (millis()-lastMovement) > resetTime/2 ) {
-    // start warning of finishing
-
-    // if been full time, reset everything
-    if ( (millis()-lastMovement) > resetTime ) {
-      resetTracing();
-      interactionFlag = false;
-      println("full reset");
-    }
-  }  */
-
-
-  //text(handVec.x + " " + handVec.y + " " + handVec.z, 100, 100);
-}
-// -----------------------------------------------------------------
-// interaction and instructions
-
-void resetTracing() {
-  println("resetting tracing array");
-  pen.reset();
-  lastMovement = millis();
-}
-
-void drawBackgroundAndCharacter(boolean penDown) {
-  if ( penDown) {
+  // if hand is being tracked and close enough to camera
+  if ( handsTrackFlag && handVec.z < 1100) {
     background(penBG);
     if ( currChar != "" ) {
       TracedCharacter tc = (TracedCharacter) charImages.get(currChar);
       tc.drawCharacter();
     }
-  } 
+    pen.display();
+
+    image(penCursor, penX, penY);
+
+    pen.record(int(penX), int(penY));
+    println(context.sceneWidth() - handVec.y);
+    lastMovement = millis();
+    prevPenState = true;
+  }
   else {
     background(noPenBG);
     if ( currChar != "" ) {
-      TracedCharacter tc = (TracedCharacter) charImages.get(currChar);
+      TracedCharacter tc = (TracedCharacter)charImages.get(currChar);
       tc.drawCharacter();
     }
+    pen.display();
+
+    // show where hand is being tracked
+    fill(255);
+    noStroke();
+
+    ellipse(penX, penY, 15, 15);
+    if (prevPenState) {
+      pen.up();
+    }
+    prevPenState = false;
   }
+
+
+  // check time and reset if necessary
+  if ( (millis()-lastMovement) > resetTime ) {
+    println("resetting tracing array");
+    pen.reset();
+    lastMovement = millis();
+  } 
+
+
+  //text(handVec.x + " " + handVec.y + " " + handVec.z, 100, 100);
 }
-
-// 
-void startInteraction() {
-  if ( countdownTime == 0) {
-    countdownTime = millis();
-  }
-  int elapsed = millis()-countdownTime;
-
-  if ( elapsed < 1000 )
-    image(countdown3, width/2, height/2, width, height);
-  if ( elapsed >= 1000 && elapsed < 2000 )
-    image(countdown2, width/2, height/2, width, height);
-  if ( elapsed >= 2000 && elapsed < 3000 )
-    image(countdown1, width/2, height/2, width, height);
-  if ( elapsed >= 3000 && elapsed < 4000)
-    image(draw, width/2, height/2, width, height);
-  if ( elapsed >= 4000) {
-    interactionFlag = true; // start full drawing mode
-    countdownTime = 0; // reset timer
-  }
-}
-
 
 // -----------------------------------------------------------------
 // character tracing
@@ -264,13 +179,9 @@ void keyPressed() {
 void updateCharacter(String inputChar) {
   if ( charImages.containsKey(inputChar) ) {
     currChar = inputChar;
-    resetTracing();
-  } 
-  else {
-    println("Not known key");
+  } else {
+     println("Not known key"); 
   }
-  if ( inputChar.equals("D") )
-    resetTracing();
 }
 
 
@@ -281,6 +192,7 @@ void mapHandToPen(float handX, float handY) {
 
   penX = map(handX, -500, 500, 0, width);
   penY = handY * -1.73 + 508;
+  //println(handY + " " + penY);
 }
 
 // -----------------------------------------------------------------
@@ -350,6 +262,7 @@ void loadNewImage() {
   String card = "";
   TracedCharacter charImage;
 
+  println(characters.countChildren());
   for (int i = 0; i < characters.countChildren();i++) {
     // retrieve character
     character = characters.getChild(i).getChildren();
@@ -368,6 +281,7 @@ void loadNewImage() {
   }
   // set character to display
   updateCharacter("1");
+  println(currChar);
 }
 
 
@@ -376,9 +290,11 @@ void loadNewImage() {
 void serialEvent(Serial myPort) {
   // read a byte from the serial port:
   String inString = myPort.readStringUntil('\r');
+  println(inString);
 
   String trimmedString = trim( inString );
+  println( trimmedString);
   //updateCharacter( trimmedString.charAt(0) );
-  updateCharacter( trimmedString );
+    updateCharacter( trimmedString );
 }
 
