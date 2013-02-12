@@ -43,7 +43,12 @@ XMLElement characters;
 XMLInOut xmlInOut;
 
 PImage wave;
+PImage countdown1;
+PImage countdown2;
+PImage countdown3;
+PImage drawImage;
 boolean showInstructions = true;
+boolean showCountdown = false;
 
 Pen pen;
 boolean prevPenState = false;
@@ -52,6 +57,7 @@ String currChar = "";
 
 int resetTime = 30000;
 int lastMovement = 0;
+int countdownTimer = 0;
 
 
 float penX, penY, penZ;
@@ -113,6 +119,10 @@ void setup() {
   pen = new Pen();
 
   wave = loadImage("wave.png");
+  countdown1  = loadImage("position1.png");
+  countdown2  = loadImage("position2.png");
+  countdown3  = loadImage("position3.png");
+  drawImage = loadImage("draw.png");
 
   noCursor();
   smooth();
@@ -122,10 +132,27 @@ void draw() {
   // update the Kinect
   context.update();
 
-  if ( showInstructions ) {
+  if ( showInstructions || showCountdown ) {
     drawBackgroundAndCharacter( false );
-    image(wave, width/2, height/2, width, height);
-  } 
+
+    if (showInstructions)
+      image(wave, width/2, height/2, width, height);
+
+    if ( showCountdown ) {
+      startInteraction();
+
+      // transform hand to window pixels
+      mapHandToPen(handVec.x, handVec.y);
+      // if hand is being tracked
+      if ( handsTrackFlag ) {
+        fill(255);
+        noStroke();
+
+        ellipse(penX, penY, 15, 15);
+        lastMovement = millis();
+      }
+    }
+  }
   else {
 
     // transform hand to window pixels
@@ -140,7 +167,6 @@ void draw() {
       image(penCursor, penX, penY);
 
       pen.record(int(penX), int(penY));
-      println(context.sceneWidth() - handVec.y);
       lastMovement = millis();
       prevPenState = true;
     }
@@ -182,6 +208,22 @@ void resetTracing() {
   lastMovement = millis();
 }
 
+void startInteraction() {
+  int elapsed = millis()-countdownTimer;
+  resetTracing();
+
+  if ( elapsed < 1000 )
+    image(countdown3, width/2, height/2, width, height);
+  if ( elapsed >= 1000 && elapsed < 2000 )
+    image(countdown2, width/2, height/2, width, height);
+  if ( elapsed >= 2000 && elapsed < 3000 )
+    image(countdown1, width/2, height/2, width, height);
+  if ( elapsed >= 3000 && elapsed < 4000)
+    image(drawImage, width/2, height/2, width, height);
+  if ( elapsed > 4000 ) 
+    showCountdown = false;
+}
+
 void drawBackgroundAndCharacter(boolean penDown) {
   if ( penDown) {
     background(penBG);
@@ -205,6 +247,28 @@ void keyPressed() {
 }
 
 void updateCharacter(String inputChar) {
+  if ( charImages.containsKey(inputChar) ) {
+    resetTracing();
+    currChar = inputChar;
+
+    // show countdown again
+    showCountdown = true;
+    countdownTimer = millis();
+  } 
+  else {
+    if ( inputChar.equals("D") ) {
+      resetTracing();
+      // show countdown again
+      showCountdown = true;
+      countdownTimer = millis();
+    } 
+    else {
+      println("Not known key");
+    }
+  }
+}
+
+void updateCharacter(String inputChar, boolean countdown) {
   if ( charImages.containsKey(inputChar) ) {
     resetTracing();
     currChar = inputChar;
@@ -244,6 +308,10 @@ void onCreateHands(int handId, PVector pos, float time)
   handVecList.add(pos);
 
   showInstructions = false;
+  showCountdown = true;
+  countdownTimer = millis();
+
+  println("---- start countdown from onCreateHands");
 }
 
 void onUpdateHands(int handId, PVector pos, float time)
@@ -263,6 +331,7 @@ void onDestroyHands(int handId, float time)
   println("onDestroyHandsCb - handId: " + handId + ", time:" + time);
 
   handsTrackFlag = false;
+  showInstructions = true;
   context.addGesture(lastGesture);
 }
 
@@ -317,8 +386,7 @@ void loadNewImage() {
     charImages.put(card, charImage);
   }
   // set character to display
-  updateCharacter("1");
-  println(currChar);
+  updateCharacter("1", false);
 }
 
 
